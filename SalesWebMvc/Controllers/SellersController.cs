@@ -41,7 +41,7 @@ namespace SalesWebMvc.Controllers
       if (!ModelState.IsValid)
       {
         var departments = await _departmentService.FindAllAsync();
-        var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments};
+        var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
         return View(viewModel);
       }
       await _sellerService.InsertAsync(seller);
@@ -65,8 +65,15 @@ namespace SalesWebMvc.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
-      await _sellerService.RemoveAsync(id);
-      return RedirectToAction(nameof(Index));
+      try
+      {
+        await _sellerService.RemoveAsync(id);
+        return RedirectToAction(nameof(Index));
+      }
+      catch (IntegrityException ex)
+      {
+        return RedirectToAction(nameof(Error), new { message = ex.Message });
+      }
     }
 
     public async Task<IActionResult> Details(int? id)
@@ -104,7 +111,7 @@ namespace SalesWebMvc.Controllers
       if (!ModelState.IsValid)
       {
         var departments = await _departmentService.FindAllAsync();
-        var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments};
+        var viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
         return View(viewModel);
       }
 
